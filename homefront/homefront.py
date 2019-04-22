@@ -1,13 +1,7 @@
 import os
 import itertools
 
-
-class EnvironmentVariableMissing(ValueError):
-    pass
-
-
-class InvalidCast(ValueError):
-    pass
+from .errors import *
 
 
 class Homefront(object):
@@ -27,7 +21,7 @@ class Homefront(object):
         passed as a string or a type.
         """
         err_msg = "`required` and `default` are mutually exclusive options -- only one may be set"
-        assert not (required and bool(default)), err_msg
+        assert not (required and default is not None), err_msg
         
         env_var_name = self._clean_var_name(env_var_name)
         
@@ -118,6 +112,22 @@ class Homefront(object):
         if not len(container) == required_length:
             err_msg = "Length mismatch between arguments"
             raise ValueError(err_msg)
+
+    def get_first_existing_value(self, env_var_names, cast=None):
+        """
+        Given an ordered list of environment variable names,
+        this method returns the first found. Useful for providing
+        a series of potential environment variable names when one
+        is needed but client code is unsure which will be set in
+        the execution environment.
+        """
+        raise NotImplementedError("The lazy dev has only thought of this, not built it")
+
+    def get_all_conditional_values(self, env_var_names, predicate):
+        raise NotImplementedError("The lazy dev has only thought of this, not built it")
+
+    def get_first_conditional_value(self, env_var_names, predicate):
+        raise NotImplementedError("The lazy dev has only thought of this, not built it")
     
     def authenticate(self, required=False, default=None):
         """
@@ -132,7 +142,7 @@ class Homefront(object):
         `export AUTHENTICATION_ENVIRONMENT="US:NASA:FINANCE/COMPUTE_CLOUD3/DESKTOP:PRIVLEDGED_USER"`
         """
         err_msg = "`required` and `default` are mutually exclusive options -- only one may be set"
-        assert not (required and bool(default)), err_msg
+        assert not (required and default is not None), err_msg
         
         authentication_environment = self.get_value('AUTHENTICATION_ENVIRONMENT')
         
